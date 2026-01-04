@@ -1,0 +1,32 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+
+#grid {
+    width: 500px;
+    height: 500px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#scoreboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+}
+
+#grid div {
+    border: 1px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box {
+    background-color: #333;
+}
+
