@@ -7,7 +7,12 @@ const GOAL = "G";
 const maps = [];
 
 
-function createMap(size, pos) {
+function createMap(pos) {
+    let size = 0;
+    for(const index in pos) {
+        size = pos[index].length;
+        break;
+    }
     const map = []
     for(let y = 0; y < size; y++) {
         const row = []
@@ -29,18 +34,30 @@ function createMap(size, pos) {
 }
 
 
-createMap(10, {
+createMap({
     3: "XOBOOOGXXX",
     4: "XPBOOOOGOX",
     5: "XOOOXXXXXX"
 });
 
-createMap(10, {
-    0: "XPOOOOOOOX",
-    1: "XOOOBOBOOX",
-    2: "XXOXXXXOXX",
-    3: "XXOXXXXOXX",
-    4: "XOOXXXXOOX",
-    5: "XOOOGGOOOX"
+createMap({
+    0: "XPOOOOOOOXXXXX",
+    1: "XOOOBOBOOXXXXX",
+    2: "XXOXXXXOXXXXXX",
+    3: "XXOXXXXOXXXXXX",
+    4: "XOOXXXXOOXXXXX",
+    5: "XOOOGGOOOXXXXX"
+},);
+
+createMap({
+    3:  "XXXPOOOOOOOOOOXXX",
+    4:  "XXXOBBOOOOOOOOOXXX",
+    5:  "XXXOOOOOOOOOOOOXXX",
+    6:  "XXXXXXXXOOXXXOOXXX",
+    7:  "XGOOOOXXOOOOOOOXXX",
+    8:  "XXXXGOXXXOXXXXXXXX",
+    9:  "XXXXOOXXXOOXXXXXXX",
+    10: "XXXXOOOOOOOXXXXXXX",
+    11: "XXXXOOOXXXXXXXXXXX"
 },);
 
