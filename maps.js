@@ -30,8 +30,8 @@ function createMap(size, pos) {
 
 
 createMap(10, {
-    3: "XOOOXXXXXX",
-    4: "XPBOOOOOGX",
+    3: "XOBOOOGXXX",
+    4: "XPBOOOOGOX",
     5: "XOOOXXXXXX"
 });
 
