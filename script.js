@@ -2,6 +2,7 @@ const boardNode = document.querySelector("#board");
 const rootNode = document.documentElement;
 const boardNodeSize = 500;
 
+// let currentMap = [...maps[maps.length -1]]; // for map creation testing
 let currentMap = [...maps[0]];
 let level = 0;
 let playerPos = {y: 0,x: 0};
