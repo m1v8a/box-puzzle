@@ -35,3 +35,12 @@ createMap(10, {
     5: "XOOOXXXXXX"
 });
 
+createMap(10, {
+    0: "XPOOOOOOOX",
+    1: "XOOOBOBOOX",
+    2: "XXOXXXXOXX",
+    3: "XXOXXXXOXX",
+    4: "XOOXXXXOOX",
+    5: "XOOOGGOOOX"
+},);
+

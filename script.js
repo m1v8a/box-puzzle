@@ -3,19 +3,19 @@ const rootNode = document.documentElement;
 const boardNodeSize = 500;
 
 let currentMap = [...maps[0]];
+let level = 0;
 let playerPos = {y: 0,x: 0};
-let boxesPos = [];
 let goalsPos = [];
 
 
 // initializations
 rootNode.style.setProperty("--board-size", boardNodeSize + "px");
-draw();
-setPositions();
+update();
 window.addEventListener("keydown", (e) => {
     const direction = e.key.slice(5).toLowerCase();
     move(direction);
     checkForGoals();
+    
 })
 
 
@@ -34,6 +34,11 @@ function draw() {
     });
 }
 
+function update() {
+    draw();
+    setGlobals();
+}
+
 function checkForGoals() {
     let goals = 0;
     goalsPos.forEach((g) => {
@@ -45,25 +50,26 @@ function checkForGoals() {
 
     if(goals == goalsPos.length) {
         // ALL GOALS ARE REACHED
-        console.log("GOAL");
+        console.log(`Level: ${level} complete`);
+        currentMap = [...maps[++level]];
+        update();
     }
 }
 
-function setPositions() {
+function setGlobals() {
+    goalsPos = [];
     currentMap.forEach((row, rowIndex) => {
         row.forEach((column, columnIndex) => {    
             // set the positions of the main items (boxes, player, goals)
             const items = column;
             if(items[0] === PLAYER) {
                 playerPos = {y: rowIndex, x: columnIndex};
-            } else if(items[0] === BOX) {
-                boxesPos.push({y: rowIndex, x:columnIndex});
             } else if(items[0] === GOAL) {
                 goalsPos.push({y: rowIndex, x: columnIndex});
             }
             
         });
-        });
+    });
 }
 
 function move(direction) {
@@ -107,12 +113,10 @@ function move(direction) {
     const itemInfront = currentMap[nextY][nextX];
     const box = itemInfront[0];
 
-  
-
     if(itemInfront[0] == BOX) {
         const itemInfrontOfBox = currentMap[nextY + y][nextX + x];
 
-        if(itemInfrontOfBox[0] == EMPTY) return;
+        if(itemInfrontOfBox[0] == EMPTY || itemInfrontOfBox[0] == BOX) return;
 
         // if there's a box in front of the player
         // remove the box from the box's current position before moving
@@ -133,9 +137,6 @@ function move(direction) {
 
     draw();
 }
-
-
-
 
 function displayItems(items, sqr) {
     let bgColor;
