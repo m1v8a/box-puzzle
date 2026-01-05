@@ -1,207 +1,122 @@
-const grid = document.querySelector("#grid");
-const movesNode = document.querySelector(".moves");
+const boardNode = document.querySelector("#board");
+const rootNode = document.documentElement;
+const boardNodeSize = 500;
 
-// test map
-const map = [
-    ["0","0","0","0","0","0","0","0"],
-    ["0","0","0","0","0","0","0","0"],
-    ["0","1","1","1","0","1","1","0"],
-    ["0","3","2","1","1","1","1","0"],
-    ["0","1","1","1","0","0","1","0"],
-    ["0","0","0","0","0","0","1","1"],
-    ["0","0","0","4","1","1","1","1"],
-    ["0","0","0","0","0","0","0","0"],
-]
+let currentMap = [...maps[0]];
+let playerPos = {y: 0,x: 0};
+let boxesPos = [];
+let goalsPos = [];
 
-const map_2 = [
-    ["3","1","1","0","0","0","0","0"],
-    ["1","2","1","0","0","0","0","0"],
-    ["1","2","1","1","0","1","1","0"],
-    ["1","1","1","1","1","1","1","0"],
-    ["0","4","1","1","0","0","1","0"],
-    ["0","0","0","0","0","0","1","1"],
-    ["0","0","0","4","1","1","1","1"],
-    ["0","0","0","0","0","0","0","0"],
-]
 
-const map_3 = [
-    ["3","1","1","0","1","1","1","4"],
-    ["1","2","1","0","1","1","0","0"],
-    ["1","2","1","1","0","1","1","0"],
-    ["1","1","2","1","1","1","1","0"],
-    ["0","4","1","1","0","0","1","0"],
-    ["0","0","0","0","0","0","1","1"],
-    ["0","0","0","4","1","1","1","1"],
-    ["0","0","0","0","0","0","0","0"],
-]
-const maps = [map, map_2, map_3]
-
-let currentMap = maps[1];
-let level = 1;
-let moves = 0;
-let destinations = 1;
-let destinationsReached = 0;
-
-draw(currentMap);
-setDestinationsCount(currentMap)
-
+// initializations
+rootNode.style.setProperty("--board-size", boardNodeSize + "px");
+draw();
 window.addEventListener("keydown", (e) => {
-    const playerPos = getPlayerPos(currentMap);
-    switch(e.key) {
-        case "ArrowRight":
-            move(currentMap, playerPos, "right");       
-            break;
-        case "ArrowLeft":
-            move(currentMap, playerPos, "left");
-            break;
-        case "ArrowUp":
-            move(currentMap, playerPos, "up");
-            break;
-        case "ArrowDown":
-            move(currentMap, playerPos, "down");
-            break;
-    }
+    const direction = e.key.slice(5).toLowerCase();
+    move(direction);
+})
 
-    draw(currentMap)
-});
 
-function getPlayerPos(map) {
-    let pos = {};
-    map.forEach((r, ri) => {
-        r.forEach((c , ci) => {
-            if(c == "3") {
-                pos.y = ri;
-                pos.x = ci;
+function draw() {
+    boardNode.innerHTML = "";
+    currentMap.forEach((row, rowIndex) => {
+        row.forEach((column, columnIndex) => {
+            const sqr = document.createElement("div");
+            rootNode.style.setProperty("--sqr-size", boardNodeSize / currentMap.length + "px");       
+            boardNode.appendChild(sqr);
+
+            const items = currentMap[rowIndex][columnIndex];
+            displayItems(items, sqr);
+
+
+            // set the positions of the main items (boxes, player, goals)
+            if(items[0] === PLAYER) {
+                playerPos = {y: rowIndex, x: columnIndex};
+            } else if(items[0] === BOX) {
+                boxesPos.push({y: rowIndex, x:columnIndex});
+            } else if(items[0] === GOAL) {
+                goalsPos.push({y: rowIndex, x: columnIndex});
             }
+            
         });
     });
-
-    return pos
 }
 
-function draw(map) {
-    grid.innerHTML = "";
-    for(let y = 0; y < map.length; y++) {
-        for(let x = 0; x < map.length; x++) {
-            const cell = document.createElement("div");
-            const item = map[y][x];
-            const gridRect = grid.getBoundingClientRect();
-            const gridWidth = gridRect.width;
-            const gridHeight = gridRect.height;
-            cell.style.width = gridWidth / map.length + "px";
-            cell.style.height = gridHeight / map.length + "px";
-            displayItem(cell, item);
-            grid.appendChild(cell);
-        }
-    }
+function move(direction) {
+    const player = currentMap[playerPos.y][playerPos.x][0];
 
-    movesNode.innerText = moves;
-
-}
-
-function setDestinationsCount(map){
-    destinations = 0;
-    for(let y = 0; y < map.length; y++) {
-        for(let x = 0; x < map.length; x++) {
-            const item = map[y][x];
-            if(item == "4") {
-                destinations++
-            }
-        }
-    }
-}
-
-function displayItem(cell, item) {
-    // set the text for the meant time;
-    switch(item) {
-        case "0":
-            cell.style.backgroundColor = "#000";
-            break;
-        case "1":
-            cell.style.backgroundColor = "#333";
-            break;
-        case "2":
-            cell.style.backgroundColor = "#9a631cff";
-            break;
-        case "3":
-            cell.style.backgroundColor = "#3d97b8ff";
-            break;    
-        case "4":
-            cell.style.backgroundColor = "#4eb83dff";
-            break; 
-    }
-}
-
-function move(map, itemPos, direction) {
-    const item = map[itemPos.y][itemPos.x];
-
-    let posY = 0;
-    let posX = 0
-
+    let y = 0;
+    let x = 0;
     switch(direction) {
         case "right":
-            posX = 1;
+            x = 1;
             break;
         case "left":
-            posX = -1;
+            x = -1;
             break;
         case "up":
-            posY = -1;
+            y = -1
             break;
         case "down":
-            posY = 1;
+            y = 1;
             break;
     }
 
+    const nextY = playerPos.y + y;
+    const nextX = playerPos.x + x;
+
+    // prevent the player from moving out of bounds
+    if (playerPos.y + y < 0 || 
+        playerPos.x + x < 0 || 
+        playerPos.y > currentMap.length || 
+        playerPos.x > currentMap[0].length ||
+        currentMap[nextY][nextX][0] == EMPTY) {
+            return;
+    };
     
-    // prevent from moving out of bounds
 
-    let cellInFrontX = itemPos.x + posX < 0 ? 0 : itemPos.x + posX;
-    let cellInFrontY = itemPos.y + posY < 0 ? 0 : itemPos.y + posY;
-    let cellInFront = map[cellInFrontY][cellInFrontX];
-    if(cellInFront == "0" || cellInFront == undefined) return;
+    // if the player bumps to a box
+    // the box moves in the same direction as the player
+    const itemInfront = currentMap[nextY][nextX][0];
+    if(itemInfront == BOX) {
+        const box = itemInfront;
+        const itemInfrontOfBox = currentMap[nextY + y][nextX + x];
+        if(itemInfrontOfBox[0] == EMPTY) return;
 
-    // if the cell in front of the player is a box, move the box
-    if(cellInFront == "2") {
-        let boxCellInFrontY = itemPos.y + (posY * 2);
-        let boxCellInFrontX = itemPos.x + (posX * 2);
-        boxCellInFrontY = boxCellInFrontY < 0 ? 0 : boxCellInFrontY;
-        boxCellInFrontX = boxCellInFrontX < 0 ? 0 : boxCellInFrontX;
-        const boxCellInFront = map[boxCellInFrontY][boxCellInFrontX]
-
-        // prevent the box from moving out of bounds
-        if(boxCellInFront == "0" || boxCellInFront === undefined || boxCellInFront == "2") return;
-        
-        // if the cell in front of the box is 4 it means the box reaches its desitination
-        // hence the round complete alert
-        // TODO: improve the round complete state
-        if(boxCellInFront == "4") {
-           destinationsReached++;
-           if(destinationsReached === destinations) {
-                level += 1;
-                moves = 0;
-                currentMap = maps[level - 1];
-                destinationsReached = 0;
-                draw(currentMap);
-                setDestinationsCount(currentMap);
-                return;
-           }
-        }
-
-        map[boxCellInFrontY][boxCellInFrontX] = "2";
+        currentMap[nextY][nextX].shift();
+        currentMap[nextY + y][nextX + x].unshift(box);
+        currentMap[playerPos.y][playerPos.x].shift(); 
+    } else {
+        currentMap[playerPos.y][playerPos.x].shift(); 
     }
+    currentMap[nextY][nextX].unshift(player);
+    playerPos = {y: nextY, x: nextX};
 
-    // changes the item on the previous location to be a floor
-    // explicitly changing it to "1" cause we only move on floors anyway
-    map[itemPos.y][itemPos.x] = "1";
-
-
-    // move the item depending the on value of the posY & posX
-    // if posX == 1, it'll move 1 cell to the right, -1 moves to the left
-    // if posY == 1, it'll move 1 cell down, -1 moves up
-    map[cellInFrontY][cellInFrontX] = item;
-    moves += 1;
+    draw();
 }
 
 
+
+
+function displayItems(items, sqr) {
+    let bgColor;
+    switch(items[0]) {
+        case EMPTY:
+            bgColor = "#000";
+            break;
+        case FLOOR:
+            bgColor = "#333";
+            break;
+        case PLAYER:
+            bgColor = "#55F";
+            break;
+        case BOX:
+            bgColor = "#F55";
+            break;
+        case GOAL:
+            bgColor = "#5F5";
+    }
+
+    sqr.style.setProperty("background-color", bgColor);
+}
 

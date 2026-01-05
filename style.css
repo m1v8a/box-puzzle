@@ -4,26 +4,29 @@
     margin: 0;
 }
 
-
-#grid {
-    width: 500px;
-    height: 500px;
+#board {
+    width: var(--board-size);
+    height: var(--board-size);
     display: flex;
     flex-wrap: wrap;
+    margin-top: 1rem;
 }
 
 #scoreboard {
     position: absolute;
     top: 0;
     left: 0;
-    color: #fff;
+    /* color: #fff; */
 }
 
-#grid div {
+#board div {
+    width: var(--sqr-size);
+    height: var(--sqr-size);
     border: 1px solid;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: var(--bg-color);
 }
 
 .box {
